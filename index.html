@@ -6,10 +6,14 @@
 <title>挽昼个人主页</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui, sans-serif;}
+
+.bg-layer{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background: linear-gradient(160deg,#0b1022 0%,#192446 40%,#2b3b66 100%);
+}
 body{
-    background: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-    background-size:cover;
-    background-attachment:fixed;
     color:#fff;
     min-height:200vh;
     padding:30px 15px;
@@ -35,6 +39,11 @@ body{
     height:90px;
     border-radius:50%;
     border:2px solid #ffffff44;
+    background:#446;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
 }
 .info h2{font-size:22px;margin-bottom:6px;}
 .info .qq{opacity:0.85;font-size:14px;}
@@ -70,6 +79,7 @@ body{
     width:80px;
     height:80px;
     border-radius:50%;
+    background:#446;
 }
 .audio-buttons button{
     width:44px;height:44px;
@@ -81,7 +91,6 @@ body{
     cursor:pointer;
     margin:0 4px;
 }
-/* 随机数模块，在页面下方，滚动才看到 */
 .random-box{
     margin-top:800px;
 }
@@ -119,13 +128,27 @@ button.gen-btn{
     font-size:13px;
     opacity:0.7;
 }
+/*点击粒子*/
+.particle{
+    position:fixed;
+    pointer-events:none;
+    border-radius:50%;
+    z-index:9999;
+}
 </style>
 </head>
 <body>
+<div class="bg-layer"></div>
+
+<!--背景音乐-->
+<audio id="bgMusic" loop preload="auto">
+  <!--你可以替换src为自己的音乐链接-->
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+
 
 <div class="glass">
     <div class="header-card">
-        <img class="avatar" src="https://p3-flow-image-sign.byteimg.com/tos-cn-i-a9rns2rl98/31141000043c40489222024240041111~tplv-a9rns2rl98-image.image">
+        <div class="avatar">挽</div>
         <div class="info">
             <h2>挽昼</h2>
             <div class="qq">QQ：3549288409</div>
@@ -146,20 +169,17 @@ button.gen-btn{
 
 <div class="glass">
     <div class="audio-card">
-        <img class="audio-avatar" src="https://p3-flow-image-sign.byteimg.com/tos-cn-i-a9rns2rl98/31141000043c40489222024240041111~tplv-a9rns2rl98-image.image">
+        <div class="audio-avatar"></div>
         <div>
-            <div style="margin-bottom:10px;">最初的记忆</div>
+            <div style="margin-bottom:10px;">背景音乐</div>
             <div class="audio-buttons">
-                <button>◀</button>
-                <button>▶</button>
-                <button>▶▶</button>
-                <button>■</button>
+                <button onclick="playMusic()">▶</button>
+                <button onclick="pauseMusic()">■</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 往下滚动才能看到：随机数字生成器 -->
 <div class="glass random-box">
     <h2>🎲 随机数字生成器</h2>
     <div>
@@ -181,6 +201,47 @@ button.gen-btn{
 </div>
 
 <script>
+//音乐控制
+const audio=document.getElementById("bgMusic");
+function playMusic(){audio.play();}
+function pauseMusic(){audio.pause();}
+
+//点击粒子特效
+document.addEventListener("click",e=>{
+    for(let i=0;i<8;i++){
+        const p=document.createElement("div");
+        p.className="particle";
+        const size=Math.random()*8+4;
+        p.style.width=size+"px";
+        p.style.height=size+"px";
+        p.style.left=e.clientX+"px";
+        p.style.top=e.clientY+"px";
+        p.style.background=`hsl(${Math.random()*360},80%,60%)`;
+        document.body.appendChild(p);
+
+        const angle=Math.random()*Math.PI*2;
+        const speed=Math.random()*120+60;
+        const vx=Math.cos(angle)*speed;
+        const vy=Math.sin(angle)*speed;
+        let x=e.clientX,y=e.clientY,opacity=1;
+        function tick(){
+            x+=vx*0.02;
+            y+=vy*0.02;
+            opacity-=0.025;
+            p.style.left=x+"px";
+            p.style.top=y+"px";
+            p.style.opacity=opacity;
+            if(opacity>0){
+                requestAnimationFrame(tick);
+            }else{
+                p.remove();
+            }
+        }
+        tick();
+    }
+})
+
+//随机数
 function genRandom(){
     const min = parseInt(document.getElementById('minVal').value);
     const max = parseInt(document.getElementById('maxVal').value);
@@ -209,3 +270,4 @@ function genRandom(){
 </script>
 </body>
 </html>
+
